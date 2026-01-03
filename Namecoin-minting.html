@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Namecoin Domain Registration — Template</title>
+
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --panel: #111828;
+      --panel-2: #0f1624;
+      --text: #e8eef7;
+      --muted: #a9b6c8;
+      --border: rgba(255, 255, 255, 0.10);
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      --accent: #00c896;
+
+      --code-bg: rgba(0, 0, 0, 0.35);
+      --code-border: rgba(255, 255, 255, 0.12);
+
+      --btn-bg: rgba(255, 255, 255, 0.08);
+      --btn-border: rgba(255, 255, 255, 0.14);
+      --btn-hover: rgba(255, 255, 255, 0.12);
+      --btn-text: var(--text);
+      --accent-text: #06110d;
+
+      --radius: 16px;
+      --radius-sm: 12px;
+    }
+
+    [data-theme="light"] {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --panel-2: #ffffff;
+      --text: #0d1220;
+      --muted: #4b5566;
+      --border: rgba(15, 23, 42, 0.12);
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
+      --accent: #0f766e;
+
+      --code-bg: rgba(15, 23, 42, 0.06);
+      --code-border: rgba(15, 23, 42, 0.10);
+
+      --btn-bg: rgba(15, 23, 42, 0.06);
+      --btn-border: rgba(15, 23, 42, 0.10);
+      --btn-hover: rgba(15, 23, 42, 0.10);
+      --btn-text: var(--text);
+      --accent-text: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: radial-gradient(900px 480px at 20% 0%, rgba(0, 200, 150, 0.18), transparent 60%),
+                  radial-gradient(900px 520px at 80% 10%, rgba(0, 132, 255, 0.12), transparent 60%),
+                  var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.05));
+      border-bottom: 1px solid var(--border);
+    }
+
+    [data-theme="light"] .topbar {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.70));
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.2;
+      letter-spacing: 0.2px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.06);
+      font-size: 12px;
+      color: var(--muted);
+      max-width: 100%;
+      user-select: none;
+    }
+
+    [data-theme="light"] .pill {
+      background: rgba(15, 23, 42, 0.04);
+    }
+
+    .dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(0, 200, 150, 0.15);
+      flex: 0 0 auto;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 16px;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid var(--btn-border);
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      border-radius: 999px;
+      padding: 10px 12px;
+      line-height: 1;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.08s ease, background 0.2s ease, border-color 0.2s ease;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+    }
+
+    .btn:hover { background: var(--btn-hover); }
+    .btn:active { transform: translateY(1px); }
+    .btn:focus { outline: none; box-shadow: 0 0 0 4px rgba(0, 200, 150, 0.20); }
+
+    .btn-accent {
+      background: var(--accent);
+      color: var(--accent-text);
+      border-color: rgba(0,0,0,0.0);
+    }
+    .btn-accent:hover { filter: brightness(1.03); }
+    .btn-accent:focus { box-shadow: 0 0 0 4px rgba(0, 200, 150, 0.28); }
+
+    .hero {
+      margin-top: 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    [data-theme="light"] .hero {
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.02), rgba(15, 23, 42, 0.01));
+    }
+
+    .hero-title {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+      line-height: 1.3;
+      letter-spacing: 0.2px;
+    }
+
+    .hero-title span { color: var(--accent); }
+
+    .hero-sub {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    @media (min-width: 720px) {
+      .wrap { padding: 24px; }
+      .hero { padding: 20px; }
+      .grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+      .hero-title { font-size: 20px; }
+      .brand h1 { font-size: 17px; }
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-head {
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    }
+
+    [data-theme="light"] .card-head {
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.03), rgba(15, 23, 42, 0.01));
+    }
+
+    .card-head h2 {
+      margin: 0 0 6px 0;
+      font-size: 14px;
+      letter-spacing: 0.2px;
+    }
+
+    .card-head p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .card-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    pre {
+      margin: 0;
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      line-height: 1.45;
+      white-space: pre;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .actions .btn {
+      flex: 1 1 160px;
+    }
+
+    .hint {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      padding: 2px 7px;
+      border: 1px solid var(--border);
+      border-bottom-width: 2px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+    }
+
+    [data-theme="light"] .kbd {
+      background: rgba(15, 23, 42, 0.04);
+    }
+
+    .output {
+      margin-top: 12px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      background: var(--panel-2);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+
+    .output h3 {
+      margin: 0 0 8px 0;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .output pre {
+      background: transparent;
+      border: none;
+      padding: 0;
+      font-size: 12.5px;
+    }
+
+    footer {
+      margin: 18px 0 0;
+      padding: 14px 0;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body data-theme="dark">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <h1>Namecoin Domain Manager</h1>
+      </div>
+      <div class="row">
+        <button class="btn" id="themeToggle" type="button" aria-label="Toggle theme">
+          🌙 Dark
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <section class="hero">
+      <h2 class="hero-title">
+        Register <span>&lt;domain&gt;.bit</span> (Namecoin Core)
+      </h2>
+      <p class="hero-sub">
+        Required flow: <code>name_new</code> → wait about 12 blocks → <code>name_firstupdate</code> → <code>name_show</code>.
+        The value you commit is fixed here to: <code>{"ip":"127.0.0.1"}</code>.
+      </p>
+    </section>
+
+    <section class="grid" aria-label="Steps">
+      <!-- Step 1 -->
+      <article class="card">
+        <div class="card-head">
+          <h2>Step 1 — Reserve the name</h2>
+          <p>Run this first. Save the <strong>rand</strong> value it returns. Then wait about 12 blocks.</p>
+        </div>
+        <div class="card-body">
+          <pre id="cmd1">name_new d/&lt;domain&gt;</pre>
+          <div class="actions">
+            <button class="btn btn-accent" type="button" data-copy="#cmd1">Copy command</button>
+            <button class="btn" type="button" data-set-output="Reserved name. Save the rand value from name_new output. Wait ~12 blocks before Step 2.">Preview output</button>
+          </div>
+          <p class="hint">
+            The name key format is <code>d/&lt;domain&gt;</code> (represents <code>&lt;domain&gt;.bit</code>).
+          </p>
+        </div>
+      </article>
+
+      <!-- Step 2 -->
+      <article class="card">
+        <div class="card-head">
+          <h2>Step 2 — First update (finalize)</h2>
+          <p>After 12 confirmations, run this with your real <strong>rand</strong> value.</p>
+        </div>
+        <div class="card-body">
+          <pre id="cmd2">name_firstupdate d/&lt;domain&gt; &lt;rand&gt; '{"ip":"127.0.0.1"}'</pre>
+          <div class="actions">
+            <button class="btn btn-accent" type="button" data-copy="#cmd2">Copy command</button>
+            <button class="btn" type="button" data-set-output="First update submitted with value {\"ip\":\"127.0.0.1\"}. Wait for confirmation, then verify with name_show.">Preview output</button>
+          </div>
+          <p class="hint">
+            Replace <span class="kbd">&lt;rand&gt;</span> with the rand string returned by <code>name_new</code>.
+          </p>
+        </div>
+      </article>
+
+      <!-- Step 3 -->
+      <article class="card">
+        <div class="card-head">
+          <h2>Step 3 — Verify on-chain data</h2>
+          <p>Shows the current stored value for your name.</p>
+        </div>
+        <div class="card-body">
+          <pre id="cmd3">name_show d/&lt;domain&gt;</pre>
+          <div class="actions">
+            <button class="btn btn-accent" type="button" data-copy="#cmd3">Copy command</button>
+            <button class="btn" type="button" data-set-output='Example fields you may see: {"name":"d/<domain>","value":"{\"ip\":\"127.0.0.1\"}","txid":"...","expires_in":...}'>Preview output</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Step 4 -->
+      <article class="card">
+        <div class="card-head">
+          <h2>Step 4 — Update later (optional)</h2>
+          <p>Updates the stored value after you already own the name.</p>
+        </div>
+        <div class="card-body">
+          <pre id="cmd4">name_update d/&lt;domain&gt; '{"ip":"127.0.0.1"}'</pre>
+          <div class="actions">
+            <button class="btn btn-accent" type="button" data-copy="#cmd4">Copy command</button>
+            <button class="btn" type="button" data-set-output="Update submitted with value {\"ip\":\"127.0.0.1\"}. Wait for confirmation, then run name_show again.">Preview output</button>
+          </div>
+        </div>
+      </article>
+    </section>
+
+
+  </main>
+
+  <script>
+    (function () {
+      const body = document.body;
+      const themeToggle = document.getElementById("themeToggle");
+      const outputText = document.getElementById("outputText");
+
+      // Theme persistence
+      const savedTheme = localStorage.getItem("nmc_theme");
+      if (savedTheme === "light" || savedTheme === "dark") {
+        body.setAttribute("data-theme", savedTheme);
+      }
+
+      function syncThemeButton() {
+        const theme = body.getAttribute("data-theme") || "dark";
+        themeToggle.textContent = theme === "dark" ? "🌙 Dark" : "☀️ Light";
+      }
+      syncThemeButton();
+
+      themeToggle.addEventListener("click", () => {
+        const current = body.getAttribute("data-theme") || "dark";
+        const next = current === "dark" ? "light" : "dark";
+        body.setAttribute("data-theme", next);
+        localStorage.setItem("nmc_theme", next);
+        syncThemeButton();
+      });
+
+      async function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        ta.style.top = "-9999px";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        return ok;
+      }
+
+      document.addEventListener("click", async (e) => {
+        const btn = e.target.closest("[data-copy], [data-set-output]");
+        if (!btn) return;
+
+        const copySelector = btn.getAttribute("data-copy");
+        const preview = btn.getAttribute("data-set-output");
+
+        if (preview) {
+          outputText.textContent = preview;
+          return;
+        }
+
+        if (copySelector) {
+          const el = document.querySelector(copySelector);
+          if (!el) return;
+
+          const text = el.innerText.trim();
+          try {
+            await copyText(text);
+            outputText.textContent = "Copied to clipboard:\n\n" + text;
+          } catch (err) {
+            outputText.textContent =
+              "Copy failed in this browser. Tap and hold the command text to copy it manually.\n\n" + text;
+          }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
