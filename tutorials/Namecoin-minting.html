@@ -9,7 +9,6 @@
     :root {
       --bg: #0b0f19;
       --panel: #111828;
-      --panel-2: #0f1624;
       --text: #e8eef7;
       --muted: #a9b6c8;
       --border: rgba(255, 255, 255, 0.10);
@@ -32,7 +31,6 @@
     [data-theme="light"] {
       --bg: #f5f7fb;
       --panel: #ffffff;
-      --panel-2: #ffffff;
       --text: #0d1220;
       --muted: #4b5566;
       --border: rgba(15, 23, 42, 0.12);
@@ -88,65 +86,12 @@
       margin: 0 auto;
     }
 
-    .brand {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-    }
-
     .brand h1 {
       margin: 0;
       font-size: 16px;
       line-height: 1.2;
       letter-spacing: 0.2px;
       font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .brand p {
-      margin: 0;
-      font-size: 12px;
-      color: var(--muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: flex-end;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.06);
-      font-size: 12px;
-      color: var(--muted);
-      max-width: 100%;
-      user-select: none;
-    }
-
-    [data-theme="light"] .pill {
-      background: rgba(15, 23, 42, 0.04);
-    }
-
-    .dot {
-      width: 9px; height: 9px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 4px rgba(0, 200, 150, 0.15);
-      flex: 0 0 auto;
     }
 
     .wrap {
@@ -271,18 +216,28 @@
       gap: 10px;
     }
 
+    /* Default code block behavior: allow horizontal scroll if needed */
     pre {
       margin: 0;
       background: var(--code-bg);
       border: 1px solid var(--code-border);
       border-radius: var(--radius-sm);
       padding: 12px;
-      overflow: auto;
+      overflow-x: auto;
+      overflow-y: hidden;
       -webkit-overflow-scrolling: touch;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
       font-size: 13px;
       line-height: 1.45;
       white-space: pre;
+    }
+
+    /* Step 2: NO SCROLLBAR, WRAP INSTEAD */
+    .pre-wrap {
+      overflow-x: hidden;
+      overflow-y: hidden;
+      white-space: pre-wrap;   /* wraps while preserving line breaks */
+      word-break: break-word;  /* safe wrap for long tokens */
     }
 
     .actions {
@@ -323,8 +278,11 @@
       border: 1px dashed var(--border);
       border-radius: var(--radius);
       padding: 14px;
-      background: var(--panel-2);
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+      background: rgba(0,0,0,0.12);
+    }
+
+    [data-theme="light"] .output {
+      background: rgba(15,23,42,0.03);
     }
 
     .output h3 {
@@ -340,14 +298,9 @@
       border: none;
       padding: 0;
       font-size: 12.5px;
-    }
-
-    footer {
-      margin: 18px 0 0;
-      padding: 14px 0;
-      color: var(--muted);
-      font-size: 12px;
-      text-align: center;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow: visible;
     }
   </style>
 </head>
@@ -358,22 +311,18 @@
       <div class="brand">
         <h1>Namecoin Domain Manager</h1>
       </div>
-      <div class="row">
-        <button class="btn" id="themeToggle" type="button" aria-label="Toggle theme">
-          🌙 Dark
-        </button>
+      <div class="actions">
+        <button class="btn" id="themeToggle" type="button" aria-label="Toggle theme">🌙 Dark</button>
       </div>
     </div>
   </div>
 
   <main class="wrap">
     <section class="hero">
-      <h2 class="hero-title">
-        Register <span>&lt;domain&gt;.bit</span> (Namecoin Core)
-      </h2>
+      <h2 class="hero-title">Register <span>&lt;domain&gt;.bit</span> (Namecoin Core)</h2>
       <p class="hero-sub">
         Required flow: <code>name_new</code> → wait about 12 blocks → <code>name_firstupdate</code> → <code>name_show</code>.
-        The value you commit is fixed here to: <code>{"ip":"127.0.0.1"}</code>.
+        Value used here is fixed to: <code>{"ip":"127.0.0.1"}</code>.
       </p>
     </section>
 
@@ -382,16 +331,21 @@
       <article class="card">
         <div class="card-head">
           <h2>Step 1 — Reserve the name</h2>
-          <p>Run this first. Save the <strong>rand</strong> value it returns. Then wait about 12 blocks.</p>
+          <p>
+            Run this first. The output contains two values:
+            <strong>txid</strong> (first) and <strong>rand</strong> (second).
+            You must use both in Step 2.
+          </p>
         </div>
         <div class="card-body">
           <pre id="cmd1">name_new d/&lt;domain&gt;</pre>
           <div class="actions">
             <button class="btn btn-accent" type="button" data-copy="#cmd1">Copy command</button>
-            <button class="btn" type="button" data-set-output="Reserved name. Save the rand value from name_new output. Wait ~12 blocks before Step 2.">Preview output</button>
+            <button class="btn" type="button"
+              data-set-output="Expected output format:\n[\n  \"<txid_64_hex>\",\n  \"<rand_hex>\"\n]\n\n- First value: txid (64 hex)\n- Second value: rand (hex, often 40)">Preview output</button>
           </div>
           <p class="hint">
-            The name key format is <code>d/&lt;domain&gt;</code> (represents <code>&lt;domain&gt;.bit</code>).
+            Wait about <span class="kbd">12 blocks</span> after <code>name_new</code> before Step 2.
           </p>
         </div>
       </article>
@@ -400,16 +354,21 @@
       <article class="card">
         <div class="card-head">
           <h2>Step 2 — First update (finalize)</h2>
-          <p>After 12 confirmations, run this with your real <strong>rand</strong> value.</p>
+          <p>
+            This template uses the format that requires BOTH values from Step 1:
+            <span class="kbd">rand</span> then <span class="kbd">txid</span>.
+          </p>
         </div>
         <div class="card-body">
-          <pre id="cmd2">name_firstupdate d/&lt;domain&gt; &lt;rand&gt; '{"ip":"127.0.0.1"}'</pre>
+          <!-- NOTE: visually wraps, no scrollbar; still copies cleanly -->
+          <pre id="cmd2" class="pre-wrap">name_firstupdate d/&lt;domain&gt; &lt;rand&gt; &lt;txid&gt; '{"ip":"127.0.0.1"}'</pre>
           <div class="actions">
             <button class="btn btn-accent" type="button" data-copy="#cmd2">Copy command</button>
-            <button class="btn" type="button" data-set-output="First update submitted with value {\"ip\":\"127.0.0.1\"}. Wait for confirmation, then verify with name_show.">Preview output</button>
+            <button class="btn" type="button"
+              data-set-output="Argument mapping:\n- <rand> = SECOND value returned by name_new\n- <txid> = FIRST value returned by name_new\n\nIf you omit <txid> on builds that require it, the parser can treat your JSON as the txid and throw a length error.">Preview output</button>
           </div>
           <p class="hint">
-            Replace <span class="kbd">&lt;rand&gt;</span> with the rand string returned by <code>name_new</code>.
+            Replace <span class="kbd">&lt;rand&gt;</span> (second hash) and <span class="kbd">&lt;txid&gt;</span> (first hash) from <code>name_new</code>.
           </p>
         </div>
       </article>
@@ -417,14 +376,18 @@
       <!-- Step 3 -->
       <article class="card">
         <div class="card-head">
-          <h2>Step 3 — Verify on-chain data</h2>
-          <p>Shows the current stored value for your name.</p>
+          <h2>Step 3 — Verify</h2>
+          <p>
+            <code>name_show</code> will return “name not found” until the Step 2 transaction is mined
+            and your node is synced.
+          </p>
         </div>
         <div class="card-body">
           <pre id="cmd3">name_show d/&lt;domain&gt;</pre>
           <div class="actions">
             <button class="btn btn-accent" type="button" data-copy="#cmd3">Copy command</button>
-            <button class="btn" type="button" data-set-output='Example fields you may see: {"name":"d/<domain>","value":"{\"ip\":\"127.0.0.1\"}","txid":"...","expires_in":...}'>Preview output</button>
+            <button class="btn" type="button"
+              data-set-output="If you get \"name not found\" right after name_firstupdate:\n- Check confirmations:\n  gettransaction <name_firstupdate_txid>\n- Confirm node sync:\n  getblockchaininfo (blocks should match headers)">Preview output</button>
           </div>
         </div>
       </article>
@@ -433,19 +396,23 @@
       <article class="card">
         <div class="card-head">
           <h2>Step 4 — Update later (optional)</h2>
-          <p>Updates the stored value after you already own the name.</p>
+          <p>After you own the name, you can update the value again.</p>
         </div>
         <div class="card-body">
           <pre id="cmd4">name_update d/&lt;domain&gt; '{"ip":"127.0.0.1"}'</pre>
           <div class="actions">
             <button class="btn btn-accent" type="button" data-copy="#cmd4">Copy command</button>
-            <button class="btn" type="button" data-set-output="Update submitted with value {\"ip\":\"127.0.0.1\"}. Wait for confirmation, then run name_show again.">Preview output</button>
+            <button class="btn" type="button"
+              data-set-output="After name_update, verify:\nname_show d/<domain>\n\nIf it still says \"name not found\", your update has not confirmed or the node is not synced.">Preview output</button>
           </div>
         </div>
       </article>
     </section>
 
-
+    <section class="output" aria-label="Output preview">
+      <h3>Output / Notes</h3>
+      <pre id="outputText">Tap “Preview output” on any step, or use “Copy command” to paste into your terminal.</pre>
+    </section>
   </main>
 
   <script>
@@ -454,7 +421,6 @@
       const themeToggle = document.getElementById("themeToggle");
       const outputText = document.getElementById("outputText");
 
-      // Theme persistence
       const savedTheme = localStorage.getItem("nmc_theme");
       if (savedTheme === "light" || savedTheme === "dark") {
         body.setAttribute("data-theme", savedTheme);
